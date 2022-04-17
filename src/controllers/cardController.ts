@@ -37,11 +37,11 @@ export async function activateCard(req: Request, res: Response){
 
   const card : Card = await cardService.findCardById(parseInt(cardId));
   cardService.validateExpirationDate(card.expirationDate);
-  cardService.isActivatedCard(card.password)
-  cardService.isValidaCVV(cvv, card.securityCode);
+  cardService.activatedCard(card.password)
+  cardService.validaCVV(cvv, card.securityCode);
 	const passwordHash : string = cardService.cardPasswordHash(password);
 
-	await cardService.activeCard(parseInt(cardId), {
+	await cardService.activateCard(parseInt(cardId), {
 		...card,
 		password: passwordHash
 	});
@@ -53,13 +53,7 @@ export async function balanceCard(req: Request, res: Response) {
 	const {cardId} = req.params;
 
 	const card : Card = await cardService.findCardById(parseInt(cardId));
-	const transactions  = await cardService.paymentsCard(card.id);
-	const recharges = await cardService.rechargesCard(card.id);
-	const balance : number = cardService.balanceCard(transactions, recharges);
+	const balance  = await cardService.balanceCard(card.id);
 
-	res.status(200).send({
-		balance,
-		transactions,
-		recharges
-	});
+	res.status(200).send(balance);
 }

@@ -60,11 +60,16 @@ export async function findCardById(cardId : number){
 export function validateExpirationDate(expirationDate : string){
   if (dayjs().format('MM/YY') > expirationDate) throw {type:"bad_request", message:"expired card"}
 }
-export function isActivatedCard(password: string) {
+export function activatedCard(password: string) {
 	if (password) throw {type:"bad_request", message:"activated card"}
 }
 
-export function isValidaCVV(cvv: string, securityCode: string) {
+export function activeCard(password: string) {
+	if (!password) throw {type:"bad_request", message:'Card Not Activated'}
+}
+
+
+export function validaCVV(cvv: string, securityCode: string) {
 	const isCVV = bcrypt.compareSync(cvv, securityCode);
 	if (!isCVV) throw {type:"unauthorized", message:"cvv incorrect"}
 }
@@ -75,7 +80,7 @@ export function cardPasswordHash(password: string) {
 	return passwordHash;
 }
 
-export async function activeCard(cardId: number, activatedCard: Card) {
+export async function activateCard(cardId: number, activatedCard: Card) {
 	await cardRepository.update(cardId, activatedCard);
 }
 
@@ -103,8 +108,9 @@ export async function rechargesCard(id: number) {
 	return recharges;
 }
 
-export function balanceCard(transactions, recharges) {
-
+export async function balanceCard(id: number) {
+	const transactions  = await paymentsCard(id);
+	const recharges = await rechargesCard(id);
 	let totalRecharges = 0;
 	if (recharges.length > 0) {
 		recharges.map(recharge => (totalRecharges += recharge.amount));
@@ -113,7 +119,11 @@ export function balanceCard(transactions, recharges) {
 	if (transactions.length > 0) {
     transactions.map(payment => (totalPayments += payment.amount));
 	}
+	const balance = totalRecharges - totalPayments;
 
-
-	return totalRecharges - totalPayments;
+	return {
+		balance,
+		transactions,
+		recharges
+	}
 }
