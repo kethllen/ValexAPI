@@ -2,7 +2,7 @@ import * as cardRepository from '../repositories/cardRepository.js';
 import * as paymentRepository from '../repositories/paymentRepository.js';
 import * as rechargeRepository from '../repositories/rechargeRepository.js';
 import { TransactionTypes, CardInsertData, Card} from '../repositories/cardRepository.js';
-import * as creditCard from '../utils/cardUtils';
+import * as creditCard from '../utils/cardUtils.js';
 import { faker } from '@faker-js/faker';
 import dayjs from 'dayjs';
 import bcrypt from 'bcrypt';

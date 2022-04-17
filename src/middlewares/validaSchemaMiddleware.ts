@@ -5,7 +5,7 @@ export default function validSchema(schema) {
     const validation = schema.validate(req.body);
 
     if (validation.error) {
-      throw {type : "unprocessable_entity"}
+      throw {type : "unprocessable_entity", message : "invalid data"}
     }
     next();
   }
